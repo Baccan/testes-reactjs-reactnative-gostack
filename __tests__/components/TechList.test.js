@@ -1,9 +1,13 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, cleanup } from '@testing-library/react';
 
 import TechList from '~/components/TechList';
 
 describe('TechList component', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it('should be able to add new tech', () => {
     // getBytestId = <ul data-testid="tech-list"></ul> // por exemplo
     const { getByText, getByTestId, getByLabelText } = render(<TechList />);
@@ -17,5 +21,21 @@ describe('TechList component', () => {
 
     expect(getByTestId('tech-list')).toContainElement(getByText('Node.js'));
     expect(getByLabelText('Tech')).toHaveValue('');
+  });
+
+  it('should store techs in storage', () => {
+    let { getByTestId, getByLabelText, getByText } = render(<TechList />);
+
+    fireEvent.change(getByLabelText('Tech'), { target: { value: 'Node.js' } });
+    fireEvent.submit(getByTestId('tech-form'));
+    
+    // Limpa DOM para
+    cleanup();
+
+    // (desestrutuação) = parenteses por volta permite reutilizar a desestruturação após a declaração da variável
+    ({ getByTestId, getByLabelText, getByText } = render(<TechList />));
+
+    expect(localStorage.setItem).toHaveBeenCalledWith('techs', JSON.stringify(['Node.js']));
+    expect(getByTestId('tech-list')).toContainElement(getByText('Node.js'));
   });
 });
