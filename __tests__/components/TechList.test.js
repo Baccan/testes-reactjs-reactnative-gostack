@@ -5,15 +5,17 @@ import TechList from '~/components/TechList';
 
 describe('TechList component', () => {
   it('should be able to add new tech', () => {
-    const { getByText, getByTestId, debug } = render(<TechList />);
     // getBytestId = <ul data-testid="tech-list"></ul> // por exemplo
+    const { getByText, getByTestId, getByLabelText } = render(<TechList />);
 
-    debug();
+    // change = <input onChange={e => e.target.value} />
+    // getByLabelText = label com htmlFor="tech" e um input com id="tech"
+    fireEvent.change(getByLabelText('Tech'), { target: { value: 'Node.js' } });
+    fireEvent.submit(getByTestId('tech-form'));
 
-    fireEvent.click(getByText('Adicionar'));
-
-    debug();
+    // fireEvent.click(getByText('Adicionar'));
 
     expect(getByTestId('tech-list')).toContainElement(getByText('Node.js'));
+    expect(getByLabelText('Tech')).toHaveValue('');
   });
 });
